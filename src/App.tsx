@@ -1,49 +1,134 @@
-import { Tldraw, track, useEditor } from '@tldraw/tldraw'
-import '@tldraw/tldraw/tldraw.css'
-import { useYjsStore } from './useYjsStore'
+import { Tldraw, track, useEditor } from "@tldraw/tldraw";
+import "@tldraw/tldraw/tldraw.css";
+import { useYjsStore } from "./useYjsStore";
+import { useParams } from "react-router-dom";
+import React from "react";
 
 const HOST_URL =
-	import.meta.env.MODE === 'development'
-		? 'ws://localhost:1234'
-		: 'wss://demos.yjs.dev'
+  import.meta.env.MODE === "development"
+    ? "ws://localhost:5200/api/ws"
+    : "wss://demos.yjs.dev";
 
+type AuthKey = "pending" | "gtfo" | "ok";
+type AuthState = {
+  state: AuthKey;
+  name?: string;
+};
 export default function YjsExample() {
-	const store = useYjsStore({
-		roomId: 'example17',
-		hostUrl: HOST_URL,
-	})
+  const { streamer } = useParams();
+  const editor = useEditor();
+  const [authorized, setAuthorized] = React.useState<AuthState>({
+    state: "pending",
+  });
 
-	return (
-		<div className="tldraw__editor">
-			<Tldraw autoFocus store={store} shareZone={<NameEditor />} />
-		</div>
-	)
+  React.useEffect(() => {
+    (async () => {
+      window.fetch(`/api/list`);
+      const result = await window.fetch(`/api/permission_slip/${streamer}`);
+      if (result.status === 200) {
+        const { username } = await result.json();
+        console.warn(username);
+        setAuthorized({ state: "ok", name: username });
+        // setTimeout(() => {
+        //   editor.user.updateUserPreferences({
+        //     name: username || "",
+        //   });
+        // }, 100);
+      } else {
+        setAuthorized({ state: "gtfo" });
+      }
+    })();
+  }, [setAuthorized, streamer, editor]);
+  return authorized.state === "pending" ? (
+    <p>Loading...</p>
+  ) : authorized.state === "gtfo" ? (
+    <p>Unauthorized</p>
+  ) : (
+    <AuthorizedApp host={authorized.name === streamer} />
+  );
 }
 
-const NameEditor = track(() => {
-	const editor = useEditor()
+function AuthorizedApp({ host }: { host: boolean }) {
+  const { streamer } = useParams();
+  const store = useYjsStore({
+    roomId: streamer,
+    hostUrl: HOST_URL,
+  });
 
-	const { color, name } = editor.user
+  return (
+    <div className="tldraw__editor">
+      <Tldraw
+        autoFocus
+        store={store}
+        shareZone={host ? <InviteList /> : undefined}
+      />
+    </div>
+  );
+}
 
-	return (
-		<div style={{ pointerEvents: 'all', display: 'flex' }}>
-			<input
-				type="color"
-				value={color}
-				onChange={(e) => {
-					editor.user.updateUserPreferences({
-						color: e.currentTarget.value,
-					})
-				}}
-			/>
-			<input
-				value={name}
-				onChange={(e) => {
-					editor.user.updateUserPreferences({
-						name: e.currentTarget.value,
-					})
-				}}
-			/>
-		</div>
-	)
-})
+const InviteRow = ({
+  username,
+  user_id,
+  allowed,
+}: {
+  username: string;
+  user_id: number;
+  allowed: number;
+}) => {
+  return (
+    <div>
+      <input
+        type="checkbox"
+        id={`checkbox-${username}`}
+        defaultChecked={Boolean(allowed)}
+        onChange={async (e) => {
+          const method = e.target.checked ? "put" : "delete";
+          e.target.disabled = true;
+          await window.fetch(`/api/perms/${user_id}`, { method });
+          e.target.disabled = false;
+        }}
+      />
+      <label htmlFor={`checkbox-${username}`}>{username}</label>
+    </div>
+  );
+};
+const InviteListActual = track(() => {
+  const [data, setData] = React.useState<any>(null);
+  React.useEffect(() => {
+    (async () => {
+      const result = await window.fetch(`/api/list`);
+      if (result.status === 200) {
+        const { data } = await result.json();
+        setData(data);
+      }
+    })();
+  }, [setData]);
+  return data?.map((e: any) => <InviteRow {...e} key={e.user_id} />);
+});
+
+const InviteList = track(() => {
+  const [show, setShow] = React.useState(false);
+  // onChange={(e) => {
+  //   editor.user.updateUserPreferences({
+  //     color: e.currentTarget.value,
+  //   });
+  // }}
+  return (
+    <div
+      style={{ pointerEvents: "all", display: "flex", flexDirection: "column" }}
+    >
+      <button
+        onClick={() => {
+          setShow((show) => !show);
+        }}
+      >
+        Permissions
+      </button>
+      {show ? (
+        <div>
+          <InviteListActual />
+        </div>
+      ) : null}
+    </div>
+  );
+});
