@@ -1,3 +1,4 @@
+*.sqlite
 dbDir/
 # Logs
 logs
