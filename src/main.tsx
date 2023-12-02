@@ -1,11 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.tsx";
 import "./index.css";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Login } from "./Login.tsx";
 import { OAuth } from "./OAuth.tsx";
+import { App } from "./App.tsx";
 
 const router = createBrowserRouter([
   {

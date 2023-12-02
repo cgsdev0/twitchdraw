@@ -14,57 +14,63 @@ type AuthState = {
   state: AuthKey;
   name?: string;
 };
-export default function YjsExample() {
+export const App = () => {
   const { streamer } = useParams();
-  const editor = useEditor();
+  // const editor = useEditor();
   const [authorized, setAuthorized] = React.useState<AuthState>({
     state: "pending",
   });
 
   React.useEffect(() => {
     (async () => {
-      window.fetch(`/api/list`);
       const result = await window.fetch(`/api/permission_slip/${streamer}`);
       if (result.status === 200) {
         const { username } = await result.json();
         console.warn(username);
         setAuthorized({ state: "ok", name: username });
         // setTimeout(() => {
-        //   editor.user.updateUserPreferences({
-        //     name: username || "",
-        //   });
         // }, 100);
       } else {
         setAuthorized({ state: "gtfo" });
       }
     })();
-  }, [setAuthorized, streamer, editor]);
+  }, [setAuthorized, streamer]);
   return authorized.state === "pending" ? (
     <p>Loading...</p>
   ) : authorized.state === "gtfo" ? (
     <p>Unauthorized</p>
   ) : (
-    <AuthorizedApp host={authorized.name === streamer} />
+    <AuthorizedApp
+      host={authorized.name === streamer}
+      name={authorized.name || ""}
+    />
   );
-}
+};
 
-function AuthorizedApp({ host }: { host: boolean }) {
-  const { streamer } = useParams();
-  const store = useYjsStore({
-    roomId: streamer,
-    hostUrl: HOST_URL,
-  });
+const AuthorizedApp = track(
+  ({ host, name }: { name: string; host: boolean }) => {
+    const { streamer } = useParams();
+    const store = useYjsStore({
+      roomId: streamer,
+      hostUrl: HOST_URL,
+    });
 
-  return (
-    <div className="tldraw__editor">
-      <Tldraw
-        autoFocus
-        store={store}
-        shareZone={host ? <InviteList /> : undefined}
-      />
-    </div>
-  );
-}
+    return (
+      <div className="tldraw__editor">
+        <Tldraw
+          autoFocus
+          store={store}
+          shareZone={host ? <InviteList /> : undefined}
+          onMount={(editor) => {
+            editor.user.updateUserPreferences({
+              name,
+            });
+          }}
+        />
+      </div>
+    );
+  }
+);
 
 const InviteRow = ({
   username,
