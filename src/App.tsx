@@ -68,6 +68,8 @@ const AuthorizedApp = track(
       hostUrl: HOST_URL,
     });
 
+    console.warn(streamer);
+
     return (
       <div className="tldraw__editor">
         <Tldraw
