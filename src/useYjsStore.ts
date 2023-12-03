@@ -100,7 +100,6 @@ export function useYjsStore({
         >,
         transaction: Y.Transaction
       ) => {
-        console.log(changes, transaction);
         if (transaction.local) return;
 
         const toRemove: TLRecord["id"][] = [];
