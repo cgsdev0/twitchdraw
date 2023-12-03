@@ -13,8 +13,7 @@ export const OAuth = () => {
       });
       const { username } = await result.json();
       if (username) {
-        window.location.search = "";
-        window.location.pathname = `/draw/${username}`;
+        window.location.href = `${window.location.origin}/draw/${username}`;
       }
     })();
   }, []);
