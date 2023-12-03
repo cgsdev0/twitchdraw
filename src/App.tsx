@@ -1,4 +1,4 @@
-import { Tldraw, track, useEditor } from "@tldraw/tldraw";
+import { Tldraw, track } from "@tldraw/tldraw";
 import "@tldraw/tldraw/tldraw.css";
 import { useYjsStore } from "./useYjsStore";
 import { useParams } from "react-router-dom";
