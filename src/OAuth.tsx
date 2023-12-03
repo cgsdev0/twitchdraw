@@ -2,22 +2,25 @@ import "@tldraw/tldraw/tldraw.css";
 import React from "react";
 
 export const OAuth = () => {
-  const hash = window.location.hash.replace("#", "");
-  const params = new URLSearchParams(hash);
-  const twitch_access_token = params.get("access_token");
   React.useEffect(() => {
     (async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
+      const redirect_uri = window.location.origin + window.location.pathname;
       const result = await window.fetch("/api/register", {
         method: "post",
-        body: JSON.stringify({ twitch_access_token }),
+        body: JSON.stringify({ code, redirect_uri }),
       });
-      console.log(result);
+      const { username } = await result.json();
+      if (username) {
+        window.location.search = "";
+        window.location.pathname = `/draw/${username}`;
+      }
     })();
-  }, [twitch_access_token]);
+  }, []);
   return (
-    <div className="tldraw__editor">
-      <p>you are logged in probably lol</p>
-      <p>{twitch_access_token}</p>
+    <div>
+      <p>Signing in...</p>
     </div>
   );
 };

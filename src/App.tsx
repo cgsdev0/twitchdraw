@@ -16,7 +16,6 @@ type AuthState = {
 };
 export const App = () => {
   const { streamer } = useParams();
-  // const editor = useEditor();
   const [authorized, setAuthorized] = React.useState<AuthState>({
     state: "pending",
   });
@@ -26,10 +25,9 @@ export const App = () => {
       const result = await window.fetch(`/api/permission_slip/${streamer}`);
       if (result.status === 200) {
         const { username } = await result.json();
-        console.warn(username);
         setAuthorized({ state: "ok", name: username });
-        // setTimeout(() => {
-        // }, 100);
+      } else if (result.status === 403) {
+        window.location.pathname = "/";
       } else {
         setAuthorized({ state: "gtfo" });
       }
