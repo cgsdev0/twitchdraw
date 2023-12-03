@@ -2,9 +2,7 @@ import "@tldraw/tldraw/tldraw.css";
 import { TWITCH_CLIENT_ID } from "./client_id";
 
 export const Login = () => {
-  const redirect_uri = encodeURIComponent(
-    `${window.location.protocol}://${window.location.host}/oauth`
-  );
+  const redirect_uri = `${window.location.protocol}://${window.location.host}/oauth`;
   return (
     <div className="tldraw__editor">
       <a
