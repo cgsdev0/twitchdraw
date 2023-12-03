@@ -7,7 +7,7 @@ import React from "react";
 const HOST_URL =
   import.meta.env.MODE === "development"
     ? "ws://localhost:5200/api/ws"
-    : "wss://demos.yjs.dev";
+    : "wss://draw.badcop.live/api/ws";
 
 type AuthKey = "pending" | "gtfo" | "ok";
 type AuthState = {
