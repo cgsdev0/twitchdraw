@@ -1,0 +1,105 @@
+#garbage {
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.button-twitch {
+  background-color: initial;
+  background-image: linear-gradient(#8614f8 0, #760be0 100%);
+  border-radius: 5px;
+  border-style: none;
+  box-shadow: rgba(245, 244, 247, 0.25) 0 1px 1px inset;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: Inter, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  height: 60px;
+  line-height: 60px;
+  margin-left: -4px;
+  outline: 0;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.05, 0.03, 0.35, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: bottom;
+  width: 190px;
+}
+
+.button-twitch:hover {
+  opacity: 0.7;
+}
+
+@media screen and (max-width: 1000px) {
+  .button-twitch {
+    font-size: 14px;
+    height: 55px;
+    line-height: 55px;
+    width: 150px;
+  }
+}
+
+.button-share {
+  background-color: #ea4c89;
+  border-radius: 8px;
+  border-style: none;
+  box-sizing: border-box;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  height: 40px;
+  line-height: 20px;
+  list-style: none;
+  margin: 0;
+  outline: none;
+  padding: 10px 16px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  transition: color 100ms;
+  vertical-align: baseline;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-share:hover,
+.button-share:focus {
+  background-color: #f082ac;
+}
+
+.invite-list {
+  background-color: var(--color-panel);
+  color: var(--color-text);
+  position: absolute;
+  right: 8px;
+  top: 48px;
+  padding: 6px 12px;
+  border-radius: var(--radius-4);
+  box-shadow: var(--shadow-2);
+  z-index: 10000;
+  width: 240px;
+  max-height: 50vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.invite-list hr {
+  width: 100%;
+  border: 0;
+  border-bottom: solid thin lightgray;
+}
+
+.invite-list section {
+  overflow-y: auto;
+  overflow-x: hidden;
+}

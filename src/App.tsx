@@ -1,5 +1,6 @@
 import { Tldraw, track } from "@tldraw/tldraw";
 import "@tldraw/tldraw/tldraw.css";
+import "./style.css";
 import { useYjsStore } from "./useYjsStore";
 import { useParams } from "react-router-dom";
 import React from "react";
@@ -13,6 +14,20 @@ type AuthKey = "pending" | "gtfo" | "ok";
 type AuthState = {
   state: AuthKey;
   name?: string;
+};
+
+export const Unauthorized = () => {
+  const { streamer } = useParams();
+  return (
+    <div id="garbage">
+      <h1>You need permission</h1>
+      <div>
+        You need <a href={`https://twitch.tv/${streamer}`}>{streamer}</a>&apos;s
+        permission to view this page
+      </div>
+      <div style={{ marginTop: 12 }}>(try asking in their chat!)</div>
+    </div>
+  );
 };
 export const App = () => {
   const { streamer } = useParams();
@@ -34,9 +49,9 @@ export const App = () => {
     })();
   }, [setAuthorized, streamer]);
   return authorized.state === "pending" ? (
-    <p>Loading...</p>
+    <div>Loading...</div>
   ) : authorized.state === "gtfo" ? (
-    <p>Unauthorized</p>
+    <Unauthorized />
   ) : (
     <AuthorizedApp
       host={authorized.name === streamer}
@@ -98,6 +113,11 @@ const InviteRow = ({
 };
 const InviteListActual = track(() => {
   const [data, setData] = React.useState<any>(null);
+
+  const [search, setSearch] = React.useState("");
+  const onSearch = (e: any) => {
+    setSearch(e.target.value);
+  };
   React.useEffect(() => {
     (async () => {
       const result = await window.fetch(`/api/list`);
@@ -107,29 +127,49 @@ const InviteListActual = track(() => {
       }
     })();
   }, [setData]);
-  return data?.map((e: any) => <InviteRow {...e} key={e.user_id} />);
+  const filtered = data?.filter((e: any) =>
+    e?.username?.toLowerCase().includes(search)
+  );
+
+  return (
+    <>
+      <input
+        type="text"
+        placeholder="search"
+        value={search}
+        onChange={onSearch}
+      />
+      <hr />
+      {filtered?.length ? (
+        <section>
+          {filtered.map((e: any) => (
+            <InviteRow {...e} key={e.user_id} />
+          ))}
+        </section>
+      ) : (
+        <div>No users found</div>
+      )}
+    </>
+  );
 });
 
 const InviteList = track(() => {
   const [show, setShow] = React.useState(false);
-  // onChange={(e) => {
-  //   editor.user.updateUserPreferences({
-  //     color: e.currentTarget.value,
-  //   });
-  // }}
+
   return (
     <div
       style={{ pointerEvents: "all", display: "flex", flexDirection: "column" }}
     >
       <button
+        className="button-share"
         onClick={() => {
           setShow((show) => !show);
         }}
       >
-        Permissions
+        Invite
       </button>
       {show ? (
-        <div>
+        <div className="invite-list">
           <InviteListActual />
         </div>
       ) : null}
